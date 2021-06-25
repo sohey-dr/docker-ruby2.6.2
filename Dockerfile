@@ -1,4 +1,4 @@
-FROM --platform=linux/arm/v7 ubuntu:16.04
+FROM ubuntu@sha256:f57d1d9861bfd91606b02d40f788c11da6d0156882ca29e7f69c2ccb4fbf45f0
 
 MAINTAINER sohey-dr
 
