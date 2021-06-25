@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM --platform=linux/arm/v7 ubuntu:16.04
 
 MAINTAINER sohey-dr
 
