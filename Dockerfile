@@ -1,4 +1,4 @@
-FROM --platform=linux/arm64/v8 ubuntu:20.04
+FROM --platform=linux/arm64 ubuntu:16.04
 
 MAINTAINER sohey-dr
 
