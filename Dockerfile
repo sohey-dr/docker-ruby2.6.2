@@ -1,6 +1,6 @@
 FROM ruby:2.6.2-alpine
 
-ENV RUNTIME_PACKAGES="linux-headers libxml2-dev make gcc libc-dev nodejs tzdata mysql-client" \
+ENV RUNTIME_PACKAGES="linux-headers libxml2-dev make gcc libc-dev nodejs tzdata mysql-client mariadb-dev" \
     DEV_PACKAGES="build-base curl-dev" \
     HOME="/app" \
     LANG=C.UTF-8 \
