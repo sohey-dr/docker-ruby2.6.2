@@ -1,4 +1,4 @@
-FROM --platform=linux/arm/v7 ubuntu:16.04
+FROM --platform=linux/x86_64 ubuntu:16.04
 
 WORKDIR /tmp
 
