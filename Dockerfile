@@ -1,6 +1,6 @@
 FROM ruby:2.6.2-alpine
 
-ENV RUNTIME_PACKAGES="linux-headers libxml2-dev make gcc libc-dev nodejs tzdata mysql-client mariadb-dev" \
+ENV RUNTIME_PACKAGES="linux-headers libxml2-dev make gcc libc-dev tzdata mysql-client mariadb-dev" \
     DEV_PACKAGES="build-base curl-dev" \
     HOME="/app" \
     LANG=C.UTF-8 \
@@ -11,6 +11,18 @@ RUN apk update && \
     apk add --update --virtual build-dependencies --no-cache ${DEV_PACKAGES} && \
     apk add curl && \
     apk del build-dependencies
+
+# install yarn nodejs
+RUN apk add install -y nodejs npm  \
+            && ln -s /usr/bin/nodejs /usr/bin/node \
+            && npm cache clean \
+            && npm install n -g \
+            && n stable \
+            && ln -sf /usr/local/bin/node /usr/bin/node \
+            && node -v \
+            && npm install -g yarn \
+            && apk add purge -y nodejs npm
+
 # headless chrome install
 RUN apk add --update \
             udev \
