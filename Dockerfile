@@ -13,15 +13,10 @@ RUN apk update && \
     apk del build-dependencies
 
 # install yarn nodejs
-RUN apk add install -y nodejs npm  \
-            && ln -s /usr/bin/nodejs /usr/bin/node \
-            && npm cache clean \
-            && npm install n -g \
-            && n stable \
-            && ln -sf /usr/local/bin/node /usr/bin/node \
-            && node -v \
-            && npm install -g yarn \
-            && apk add purge -y nodejs npm
+RUN apk add bash curl nodejs
+  RUN touch ~/.bashrc \
+      && curl -o- -L https://yarnpkg.com/install.sh | bash \
+      && ln -s "$HOME/.yarn/bin/yarn" /usr/local/bin/yarn
 
 # headless chrome install
 RUN apk add --update \
