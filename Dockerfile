@@ -1,18 +1,18 @@
-FROM ruby:2.6.2
+FROM ruby:2.6.2-alpine
 
 ENV RUNTIME_PACKAGES="linux-headers libxml2-dev make gcc libc-dev nodejs tzdata postgresql-dev postgresql" \
     DEV_PACKAGES="build-base curl-dev" \
     HOME="/app" \
     LANG=C.UTF-8 \
     TZ=Asia/Tokyo
-RUN apt-get update && \
-    apt-get upgrade && \
-    apt-get --update --no-cache ${RUNTIME_PACKAGES} && \
-    apt-get --update --virtual build-dependencies --no-cache ${DEV_PACKAGES} && \
-    apt-get curl && \
-    apt-get remove build-dependencies
+RUN apk update && \
+    apk upgrade && \
+    apk add --update --no-cache ${RUNTIME_PACKAGES} && \
+    apk add --update --virtual build-dependencies --no-cache ${DEV_PACKAGES} && \
+    apk add curl && \
+    apk del build-dependencies
 # headless chrome install
-RUN apt-get --update \
+RUN apk add --update \
             udev \
             ttf-freefont \
             chromium \
