@@ -2,16 +2,19 @@ FROM --platform=linux/x86_64 ruby:2.6.2
 
 ENV LANG C.UTF-8
 
-RUN set -x && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo 'deb http://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list
-RUN set -x && apt-get update -qq && \
-    apt-get install -yq build-essential nodejs yarn
+RUN bundle config --delete frozen \
+    && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+    && apt-get install -y nodejs \
+    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    && apt-get update && apt-get install yarn \
+    && rm -rf /var/lib/apt/lists/*
 
 # chrome をインストール
-RUN curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
-    && dpkg -i google-chrome.deb \
-    && sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome \
-    && rm google-chrome.deb
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add && \
+    echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | tee /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && \
+    apt-get install -y google-chrome-stable
 
 WORKDIR /app
 ENV BUNDLE_JOBS=32 \
@@ -21,7 +24,7 @@ COPY Gemfile Gemfile.lock /app/
 RUN bundle install
 
 COPY package.json yarn.lock /app/
-RUN yarn install
+RUN yarn
 
 COPY . /app
 
