@@ -6,11 +6,25 @@ WORKDIR /app
 ENV BUNDLE_JOBS=32 \
     BUNDLE_WITHOUT='production:staging'
 
-# chrome をインストール
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add && \
-    echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | tee /etc/apt/sources.list.d/google-chrome.list && \
-    apk add update && \
-    apk add install -y google-chrome-stable
+ENV RUNTIME_PACKAGES="linux-headers git libxml2-dev make gcc libc-dev nodejs tzdata postgresql-dev postgresql" \
+    DEV_PACKAGES="build-base curl-dev" \
+    HOME="/app" \
+    LANG=C.UTF-8 \
+    TZ=Asia/Tokyo
+
+RUN apk update && \
+    apk upgrade && \
+    apk add --update --no-cache ${RUNTIME_PACKAGES} && \
+    apk add --update --virtual build-dependencies --no-cache ${DEV_PACKAGES} && \
+    apk add curl && \
+    apk del build-dependencies
+
+# headless chrome install
+RUN apk add --update \
+    udev \
+    ttf-freefont \
+    chromium \
+    chromium-chromedriver
 
 COPY Gemfile Gemfile.lock /app/
 RUN bundle install
@@ -21,4 +35,3 @@ RUN yarn install
 COPY . /app
 
 ENTRYPOINT [ "./entrypoint.sh" ]
-
