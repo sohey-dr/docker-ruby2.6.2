@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 ruby:2.6.2-alpine
+FROM --platform=linux/x86_64 ruby:2.6.2
 
 ENV LANG C.UTF-8
 WORKDIR /app
@@ -6,25 +6,20 @@ WORKDIR /app
 ENV BUNDLE_JOBS=32 \
     BUNDLE_WITHOUT='production:staging'
 
-ENV RUNTIME_PACKAGES="linux-headers git libxml2-dev make gcc libc-dev nodejs tzdata postgresql-dev postgresql" \
-    DEV_PACKAGES="build-base curl-dev" \
-    HOME="/app" \
-    LANG=C.UTF-8 \
-    TZ=Asia/Tokyo
+RUN bundle config --delete frozen \
+    && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+    && apt-get install -y nodejs \
+    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    && apt-get update && apt-get install yarn \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apk update && \
-    apk upgrade && \
-    apk add --update --no-cache ${RUNTIME_PACKAGES} && \
-    apk add --update --virtual build-dependencies --no-cache ${DEV_PACKAGES} && \
-    apk add curl && \
-    apk del build-dependencies
+# chrome をインストール
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add && \
+    echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | tee /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && \
+    apt-get install -y google-chrome-stable
 
-# headless chrome install
-RUN apk add --update \
-    udev \
-    ttf-freefont \
-    chromium \
-    chromium-chromedriver
 
 COPY Gemfile Gemfile.lock /app/
 RUN bundle install
@@ -34,4 +29,6 @@ RUN yarn install
 
 COPY . /app
 
-ENTRYPOINT [ "./entrypoint.sh" ]
+COPY entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
