@@ -1,6 +1,10 @@
 FROM --platform=linux/x86_64 ruby:2.6.2
 
 ENV LANG C.UTF-8
+WORKDIR /app
+
+ENV BUNDLE_JOBS=32 \
+    BUNDLE_WITHOUT='production:staging'
 
 RUN bundle config --delete frozen \
     && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
@@ -16,15 +20,12 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
     apt-get update && \
     apt-get install -y google-chrome-stable
 
-WORKDIR /app
-ENV BUNDLE_JOBS=32 \
-    BUNDLE_WITHOUT='production:staging'
 
 COPY Gemfile Gemfile.lock /app/
 RUN bundle install
 
 COPY package.json yarn.lock /app/
-RUN yarn
+RUN yarn install
 
 COPY . /app
 
