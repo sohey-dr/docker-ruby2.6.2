@@ -6,7 +6,6 @@ WORKDIR /app
 ENV BUNDLE_JOBS=32 \
     BUNDLE_WITHOUT='production:staging'
 
-
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y \
@@ -15,14 +14,11 @@ RUN apt-get update \
     git \
     ibus-mozc \
     imagemagick \
-    language-pack-ja-base \
-    language-pack-ja \
-    libreadline-dev \
-    libmysqlclient-dev \
     libssl-dev \
     mysql-client \
     tzdata \
-    wget
+    wget \
+    musl-dev
 
 RUN bundle config --delete frozen \
     && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
@@ -46,6 +42,5 @@ COPY package.json yarn.lock /app/
 RUN yarn install
 
 COPY . /app
-
 
 ENTRYPOINT ["./entrypoint.sh"]
