@@ -20,6 +20,8 @@ RUN apt-get update \
     wget \
     musl-dev
 
+RUN ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+
 RUN bundle config --delete frozen \
     && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
     && apt-get install -y nodejs \
@@ -42,5 +44,6 @@ COPY package.json yarn.lock /app/
 RUN yarn install
 
 COPY . /app
+
 
 ENTRYPOINT ["./entrypoint.sh"]
